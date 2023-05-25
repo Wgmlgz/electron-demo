@@ -8,12 +8,14 @@
     Legend,
     BarElement,
     CategoryScale,
-    LinearScale
+    LinearScale,
+    LogarithmicScale
   } from 'chart.js';
-
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import type { LambdaStats } from './utils';
+  import  LogAxis from './scale';
 
+  Chart.register(LogAxis, ChartDataLabels)
   export let lambda_stats: LambdaStats[];
 
   const data: ChartData<'bar', (number | [number, number])[], unknown> = {
@@ -100,7 +102,6 @@
     ]
   };
 
-  Chart.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartDataLabels);
   Chart.defaults.set('plugins.datalabels', {
     color: '#FE777B'
   });
@@ -118,6 +119,9 @@
         },
         x: {
           grace: '20%',
+          display: true,
+          // @ts-ignore
+          type: 'mylog'
         }
       }
     }}
