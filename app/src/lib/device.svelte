@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { MIN_SCALE, type Device } from './utils';
-
+  import { MIN_SCALE } from './utils';
+  import type { Device } from '../../../shared.d.ts';
   export let device: Device;
   export let scale: number;
 
@@ -18,8 +18,8 @@
 
 <div class="flex flex-col" class:gap-2={!simplified}>
   <div class="box box-primary" class:box-hide={simplified}>
-    <h2 class:hide={simplified}>
-      {device.date.toDateString()}
+    <h2 class="whitespace-nowrap" class:hide={simplified}>
+      {device.date}
     </h2>
   </div>
   <div class="box box-secondary" class:box-hide={simplified}>
@@ -31,7 +31,7 @@
         <p>
           {device.currentSessionId}
         </p>
-        <p>
+        <p class="whitespace-nowrap">
           {device.engineId}
         </p>
       </div>
@@ -41,7 +41,7 @@
   <div class="grid grid-cols-5" class:gap-x-2={!simplified}>
     {#each fillArr(device.actions, 5, '') as action}
       <div
-        class="box aspect-ratio-1/1 grid items-center justify-items-center"
+        class="box grid items-center justify-items-center"
         class:box-err={action.endsWith('-')}
         class:box-ok={action.endsWith('+')}
         class:box-hide={simplified}

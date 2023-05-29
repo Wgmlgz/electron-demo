@@ -12,13 +12,15 @@
     LogarithmicScale
   } from 'chart.js';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
-  import type { LambdaStats } from './utils';
-  import  LogAxis from './scale';
+  import type { LambdaStats } from '../../../shared';
+  import LogAxis from './scale';
 
-  Chart.register(LogAxis, ChartDataLabels)
+  Chart.register(LogAxis, ChartDataLabels);
   export let lambda_stats: LambdaStats[];
 
-  const data: ChartData<'bar', (number | [number, number])[], unknown> = {
+  let data: ChartData<'bar', (number | [number, number])[], unknown> = { labels: [], datasets: [] };
+
+  $: data = {
     labels: lambda_stats.map(({ shard }) => shard),
     datasets: [
       {

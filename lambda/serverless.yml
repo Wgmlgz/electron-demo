@@ -1,0 +1,31 @@
+service: lambda
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:CreateTable
+      Resource: '*'
+      
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-offline-watcher
