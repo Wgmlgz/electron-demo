@@ -46,7 +46,7 @@ export const handler: Handler = async (event) => {
   });
 
   const grouped = _.groupBy(raw, 'shardID');
-  const lambda_stats: DeviceData['lambda_stats'] = Object.entries(grouped).map(([shardID, arr]) => {
+  const lambda_stats: DeviceData['lambda_stats'] = Object.fromEntries(Object.entries(grouped).map(([shardID, arr]) => {
     const res: LambdaStats = {
       lambda_inactivity: moment().unix() - _.max(_.map(arr, 'lambda_ts')),
       max_lambda_inactivity: 1,
@@ -54,8 +54,8 @@ export const handler: Handler = async (event) => {
       max_queuing_time: 1,
       shard: shardID
     };
-    return res;
-  });
+    return [shardID, res];
+  }));
   const res: DeviceData = {
     devices,
     lambda_stats

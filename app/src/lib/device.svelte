@@ -18,24 +18,28 @@
 
 <div class="flex flex-col" class:gap-2={!simplified}>
   <div class="box box-primary" class:box-hide={simplified}>
-    <h2 class="whitespace-nowrap" class:hide={simplified}>
-      {device.date}
-    </h2>
+    {#if !simplified}
+      <h2 class="whitespace-nowrap" class:hide={simplified}>
+        {device.date}
+      </h2>
+    {/if}
   </div>
   <div class="box box-secondary" class:box-hide={simplified}>
-    <div class="flex gap-2 justify-items-center items-center" class:hide={simplified}>
-      <h2 class="grow">
-        {device.deviceId}
-      </h2>
-      <div>
-        <p>
-          {device.currentSessionId}
-        </p>
-        <p class="whitespace-nowrap">
-          {device.engineId}
-        </p>
+    {#if !simplified}
+      <div class="flex gap-2 justify-items-center items-center" class:hide={simplified}>
+        <h2 class="grow">
+          {device.deviceId}
+        </h2>
+        <div>
+          <p>
+            {device.currentSessionId}
+          </p>
+          <p class="whitespace-nowrap">
+            {device.engineId}
+          </p>
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
 
   <div class="grid grid-cols-5" class:gap-x-2={!simplified}>
@@ -46,16 +50,20 @@
         class:box-ok={action.endsWith('+')}
         class:box-hide={simplified}
       >
-        <h3 class:hide={simplified}>
-          {action}
-        </h3>
+        {#if !simplified}
+          <h3 class:hide={simplified}>
+            {action}
+          </h3>
+        {/if}
       </div>
     {/each}
   </div>
   <div class="box" class:box-hide={simplified}>
-    <h2 class:hide={simplified}>
-      shrd: {device.shardId}
-    </h2>
+    {#if !simplified}
+      <h2 class:hide={simplified}>
+        shrd: {device.shardId}
+      </h2>
+    {/if}
   </div>
 </div>
 

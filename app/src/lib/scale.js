@@ -90,6 +90,6 @@ class LogAxis extends Scale {
     return Math.pow(2, this._startValue + decimal * this._valueRange);
   }
 }
-LogAxis.id = 'mylog';
+LogAxis.id = 'custom_log';
 LogAxis.defaults = {};
 export default LogAxis;
