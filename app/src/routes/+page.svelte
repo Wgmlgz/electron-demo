@@ -4,6 +4,7 @@
   import type { Device, LambdaStats, DeviceData } from '../../../shared';
   import createPanZoom, { type PanZoom } from 'panzoom';
   import { onMount } from 'svelte';
+  import { PUBLIC_BASE_URL } from '$env/static/public';
   import axios from 'axios';
 
   let data: DeviceData = {
@@ -12,13 +13,19 @@
   };
 
   const refresh = async () => {
-    const t: DeviceData = (await axios.get('http://localhost:666/')).data;
+    const t: DeviceData = (await axios.get(PUBLIC_BASE_URL)).data;
     console.log(t);
 
     Object.entries(t.lambda_stats).forEach(([shard, value]) => {
-      value.max_lambda_inactivity = Math.max(value.lambda_inactivity, data.lambda_stats[shard]?.max_lambda_inactivity || 0)
-      value.max_queuing_time = Math.max(value.queuing_time, data.lambda_stats[shard]?.max_queuing_time || 0)
-    })
+      value.max_lambda_inactivity = Math.max(
+        value.lambda_inactivity,
+        data.lambda_stats[shard]?.max_lambda_inactivity || 0
+      );
+      value.max_queuing_time = Math.max(
+        value.queuing_time,
+        data.lambda_stats[shard]?.max_queuing_time || 0
+      );
+    });
     data = t;
   };
 
