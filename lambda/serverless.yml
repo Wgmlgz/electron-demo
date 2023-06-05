@@ -16,6 +16,9 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:CreateTable
       Resource: '*'
+  httpApi:
+    cors: true
+
       
 functions:
   api:
