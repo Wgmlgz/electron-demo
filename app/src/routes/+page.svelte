@@ -2,7 +2,7 @@
   import DeviceComponent from '$lib/device.svelte';
   import LambdaStatsComponent from '$lib/lambda-stats.svelte';
   import type { Device, LambdaStats, DeviceData } from '../../../shared';
-  import createPanZoom, { type PanZoom } from 'panzoom';
+  import Panzoom, { type PanzoomObject } from '@panzoom/panzoom';
   import { onMount } from 'svelte';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import axios from 'axios';
@@ -33,95 +33,41 @@
     refresh();
     setInterval(() => refresh(), 10000);
   });
-
-  // const data: DeviceData = {
-  //   devices: [
-  //     {
-  //       date: new Date(),
-  //       deviceId: 'CBRXX1',
-  //       engineId: 'Cobb_mix_2403_final',
-  //       currentSessionId: 'jetson_v4.10.7.28_CGBRNT',
-  //       shardId: '0003',
-  //       actions: ['S+', 'C+', '3+', 'U-']
-  //     },
-  //     {
-  //       date: new Date(),
-  //       deviceId: 'CBRXX1',
-  //       engineId: 'Cobb_mix_2403_final',
-  //       currentSessionId: 'jetson_v4.10.7.28_CGBRNT',
-  //       shardId: '0003',
-  //       actions: ['S+', 'C+', '3+', 'U-']
-  //     },
-  //     {
-  //       date: new Date(),
-  //       deviceId: 'CBRXX1',
-  //       engineId: 'Cobb_mix_2403_final',
-  //       currentSessionId: 'jetson_v4.10.7.28_CGBRNT',
-  //       shardId: '0003',
-  //       actions: ['S+', 'C+', '3+', 'U-']
-  //     }
-  //   ],
-  //   lambda_stats: [
-  //     {
-  //       lambda_inactivity: 12,
-  //       max_lambda_inactivity: 15,
-  //       queuing_time: 20,
-  //       max_queuing_time: 30,
-  //       shard: 'shard1'
-  //     },
-  //     {
-  //       lambda_inactivity: 11,
-  //       max_lambda_inactivity: 20,
-  //       queuing_time: 15,
-  //       max_queuing_time: 35,
-  //       shard: 'shard_2'
-  //     },
-  //     {
-  //       lambda_inactivity: 22,
-  //       max_lambda_inactivity: 25,
-  //       queuing_time: 10,
-  //       max_queuing_time: 20,
-  //       shard: 'shard_3'
-  //     }
-  //   ]
-  // };
   let zoomer: HTMLElement;
-  let panzoom: PanZoom | null = null;
+  let panzoom: PanzoomObject | null = null;
   let scale = 1;
   onMount(() => {
-    panzoom = createPanZoom(zoomer, {
+    panzoom = Panzoom(zoomer, {
       // minZoom: 0.1,
       // maxZoom: 10,
+      overflow: 'auto',
       initialZoom: 1
     });
-    panzoom.on('zoom', () => {
-      if (panzoom) scale = panzoom.getTransform().scale;
-    });
+    // panzoom.ge('zoom', () => {
+    //   if (panzoom) scale = panzoom.getTransform().scale;
+    // });
+    // panzoom.on('scroll', (e) => {
+    //   console.log(e);
+    // });
   });
 </script>
 
 <div class="">
-  <div class="h-400px w-full">
+  <div class="h-400px w-full overflow-y-scroll">
     <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
   </div>
 
   <div
-    class="bg-gradient-to-b from-[#80c8ff] to-[#ffc880] h-[calc(100%-400px)] w-screen absolute overflow-clip"
+    class="bg-gradient-to-b from-[#80c8ff] to-[#ffc880] h-[calc(100%-400px)] w-screen absolute overflow-x-clip overflow-y-scroll"
   >
     <div
-      on:scroll={(e) => {
-        console.log(e);
-        console.log(panzoom?.getTransform().scale);
+      on:wheel={(e) => {
+        if (e.shiftKey) return;
+        panzoom?.zoomWithWheel(e);
       }}
       bind:this={zoomer}
     >
-      <div
-        on:scroll={(e) => {
-          console.log(e);
-          console.log(panzoom?.getTransform().scale);
-        }}
-        class="text-center"
-      >
+      <div class="text-center">
         <div class="grid gap-10 grid-cols-10 w-max">
           {#each data.devices as device}
             <DeviceComponent {scale} bind:device />

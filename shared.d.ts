@@ -1,13 +1,10 @@
-type ActionStatus = '+' | '-';
-type Action = `${string}${ActionStatus}`;
-
 export interface Device {
   date: string;
   deviceId: string;
   engineId: string;
   currentSessionId: string;
   shardId: string;
-  actions: Action[];
+  actions: string;
 }
 
 export interface LambdaStats {

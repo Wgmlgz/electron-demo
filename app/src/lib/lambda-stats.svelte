@@ -15,8 +15,13 @@
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import type { DeviceData, LambdaStats } from '../../../shared';
   import LogAxis from './scale';
+  import { onMount } from 'svelte';
 
   Chart.register(LogAxis, ChartDataLabels, Tooltip);
+  onMount(async () => {
+    const zoomPlugin = (await import('chartjs-plugin-zoom')).default;
+    Chart.register(zoomPlugin);
+  });
   export let lambda_stats: DeviceData['lambda_stats'];
 
   let data: ChartData<'bar', (number | [number, number])[], unknown> = { labels: [], datasets: [] };
@@ -159,6 +164,22 @@
           }
         }
       },
+      plugins: {
+      zoom: {
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true
+          },
+          drag: {
+            enabled: true,
+          },
+          mode: 'y',
+        }
+      }
+    }
     }}
   />
 </div>

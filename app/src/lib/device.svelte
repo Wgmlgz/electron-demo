@@ -7,12 +7,15 @@
   let simplified = false;
   $: simplified = scale <= MIN_SCALE;
 
-  const fillArr = <T>(arr: T[], n: number = 5, sus: T) => {
+  const fillArr = (actions: string, n: number = 5, sus = '  ') => {
+    const arr = actions.match(/.{1,2}/g);
+    if (!arr) throw Error('failed to parse actions string')
     let t = [...arr];
     for (let i = 0; i < n - t.length; ++i) {
       t.unshift(sus);
     }
-    return t.slice(t.length - n);
+    const res = t.slice(t.length - n)
+    return res;
   };
 </script>
 
@@ -43,7 +46,7 @@
   </div>
 
   <div class="grid grid-cols-5" class:gap-x-2={!simplified}>
-    {#each fillArr(device.actions, 5, '') as action}
+    {#each fillArr(device.actions, 5) as action}
       <div
         class="box grid items-center justify-items-center"
         class:box-err={action.endsWith('-')}
@@ -52,7 +55,7 @@
       >
         {#if !simplified}
           <h3 class:hide={simplified}>
-            {action}
+            {action[0]}
           </h3>
         {/if}
       </div>

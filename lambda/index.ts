@@ -41,7 +41,7 @@ export const handler: Handler = async (event) => {
       deviceId: item.deviceID,
       engineId: item.engineID,
       shardId: item.shardID,
-      date: new Date(item.kinesis_record_ts).toISOString()
+      date: new Date(item.kinesis_record_ts * 1000).toISOString()
     };
   });
 
