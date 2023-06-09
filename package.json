@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/Wgmlgz/electron-demo#readme",
   "devDependencies": {
-    "@panzoom/panzoom": "^4.5.1",
     "chartjs-plugin-zoom": "^2.0.1",
     "concurrently": "^8.1.0"
   }
