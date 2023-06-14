@@ -17,5 +17,6 @@ export interface LambdaStats {
 
 export interface DeviceData {
   devices: Device[];
+  problematic?: Device[];
   lambda_stats: Record<string, LambdaStats>;
 }

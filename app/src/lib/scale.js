@@ -37,8 +37,8 @@ class LogAxis extends Scale {
   }
   determineDataLimits() {
     const { min, max } = this.getMinMax(true);
-    this.min = isFinite(min) ? min : null;
-    this.max = isFinite(max) ? max : null;
+    this.min = isFinite(min) ? min * 64 : null;
+    this.max = isFinite(max) ? max * 64 : null;
   }
   buildTicks() {
     const ticks = [],

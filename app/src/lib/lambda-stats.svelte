@@ -1,52 +1,65 @@
 <script lang="ts">
   import { Bar } from 'svelte-chartjs';
-  import {
-    type ChartData,
-    Chart,
-    Title,
-    Tooltip,
-    Legend,
-    BarElement,
-    CategoryScale,
-    LinearScale,
-    LogarithmicScale,
-    type TooltipCallbacks
+  import type {
+    ChartData,
+    // Chart,
+    // Title,
+    // Tooltip,
+    // Legend,
+    // BarElement,
+    // CategoryScale,
+    // LinearScale,
+    // LogarithmicScale,
+    TooltipCallbacks
   } from 'chart.js';
   import ChartDataLabels from 'chartjs-plugin-datalabels';
   import type { DeviceData, LambdaStats } from '../../../shared';
   import LogAxis from './scale';
   import { onMount } from 'svelte';
+  import Chart from 'chart.js/auto';
 
-  Chart.register(LogAxis, ChartDataLabels, Tooltip);
+  Chart.register(LogAxis);
+  Chart.register(ChartDataLabels);
+
+  let chart: Chart | null = null;
   onMount(async () => {
     const zoomPlugin = (await import('chartjs-plugin-zoom')).default;
     Chart.register(zoomPlugin);
   });
   export let lambda_stats: DeviceData['lambda_stats'];
-
+  let ctx: HTMLCanvasElement;
   let data: ChartData<'bar', (number | [number, number])[], unknown> = { labels: [], datasets: [] };
 
   const round_to = 100;
-  const prepare = (x: number) => Math.round((x / (1000 * 60)) * round_to) / round_to;
 
-  const tooltip_cb: any = {
-    label: (tooltipItem: any, data: any) => {
-      return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-    }
+  const format = (value: number | string) => {
+    const r = Math.abs(Number(value));
+    const s = Math.floor(r % 60);
+    const m = Math.floor(r / 60);
+
+    let str = '';
+    if (m) str += `${m}m `;
+    if (1) str += `${s}s `;
+    return str;
   };
+  // const tooltip_cb: any = {
+  //   label: (tooltipItem: any, data: any) => {
+  //     return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  //   }
+  // };
 
   $: data = {
     labels: Object.keys(lambda_stats),
-    plugins: {
-      tooltip: {
-        callbacks: tooltip_cb
-      }
-    },
+    // plugins: {
+    //   tooltip: {
+    //     callbacks: tooltip_cb
+    //   }
+    // },
     datasets: [
       {
         type: 'bar',
         label: 'Queuing time',
-        data: Object.values(lambda_stats).map(({ queuing_time }) => -prepare(queuing_time)),
+        data: Object.values(lambda_stats).map(({ queuing_time }) => -queuing_time),
         backgroundColor: ['rgba(255, 134,159,0.4)'],
         borderWidth: 2,
         borderColor: ['rgba(255, 134, 159, 1)'],
@@ -56,7 +69,7 @@
           anchor: 'start',
           align: 'start',
           formatter(value, context) {
-            return `${Math.abs(value)} m`;
+            return format(value);
           },
           color: '#000'
         }
@@ -64,9 +77,7 @@
       {
         type: 'bar',
         label: 'Lambda inactivity',
-        data: Object.values(lambda_stats).map(({ lambda_inactivity }) =>
-          prepare(lambda_inactivity)
-        ),
+        data: Object.values(lambda_stats).map(({ lambda_inactivity }) => lambda_inactivity),
         backgroundColor: ['rgba(98,  182, 239,0.4)'],
         borderWidth: 2,
         borderColor: ['rgba(98,  182, 239, 1)'],
@@ -75,7 +86,7 @@
           anchor: 'end',
           align: 'end',
           formatter(value, context) {
-            return `${Math.abs(value)} m`;
+            return format(value);
           },
           color: '#000'
         }
@@ -83,7 +94,7 @@
       {
         type: 'bar',
         label: 'Max queuing time',
-        data: Object.values(lambda_stats).map(({ max_queuing_time }) => -prepare(max_queuing_time)),
+        data: Object.values(lambda_stats).map(({ max_queuing_time }) => -max_queuing_time),
         backgroundColor: '#0000',
         borderColor: ['rgba(255, 134, 159, 1)'],
         borderWidth: {
@@ -97,7 +108,7 @@
           align: 'start',
           offset: 0,
           formatter(value, context) {
-            return `${Math.abs(value)} m`;
+            return format(value);
           },
           color: '#000'
         }
@@ -105,9 +116,7 @@
       {
         type: 'bar',
         label: 'Max lambda inactivity',
-        data: Object.values(lambda_stats).map(({ max_lambda_inactivity }) =>
-          prepare(max_lambda_inactivity)
-        ),
+        data: Object.values(lambda_stats).map(({ max_lambda_inactivity }) => max_lambda_inactivity),
         backgroundColor: '#0000',
         borderColor: ['rgba(98,  182, 239, 1)'],
         borderWidth: {
@@ -121,7 +130,7 @@
           align: 'end',
           offset: 0,
           formatter(value, context) {
-            return `${Math.abs(value)} m`;
+            return format(value);
           },
           color: '#000'
         }
@@ -148,7 +157,7 @@
           stacked: true,
           ticks: {
             callback: function (value, index, ticks) {
-              return Object.keys(lambda_stats)[Number(value)];
+              return `shrd: ${Object.keys(lambda_stats)[Number(value)]}`;
             }
           }
         },
@@ -159,27 +168,27 @@
           type: 'custom_log',
           ticks: {
             callback: function (value, index, ticks) {
-              return Math.abs(Number(value));
+              return format(value);
             }
           }
         }
       },
       plugins: {
-      zoom: {
         zoom: {
-          wheel: {
-            enabled: true,
-          },
-          pinch: {
-            enabled: true
-          },
-          drag: {
-            enabled: true,
-          },
-          mode: 'y',
+          zoom: {
+            wheel: {
+              enabled: true
+            },
+            pinch: {
+              enabled: true
+            },
+            drag: {
+              enabled: true
+            },
+            mode: 'y'
+          }
         }
       }
-    }
     }}
   />
 </div>
