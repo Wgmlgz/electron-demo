@@ -6,8 +6,10 @@
   import { onMount } from 'svelte';
   import { PUBLIC_BASE_URL } from '$env/static/public';
   import axios from 'axios';
-  import { Select, SelectItem, ProgressBar, Checkbox } from 'carbon-components-svelte';
+  import { Select, SelectItem, ProgressBar, Checkbox, Content } from 'carbon-components-svelte';
   import { fillArr } from '$lib/utils';
+  import { Tabs, Tab, TabContent } from 'carbon-components-svelte';
+  import { Grid, Row, Column } from 'carbon-components-svelte';
 
   let data: DeviceData = {
     devices: [],
@@ -33,8 +35,15 @@
       );
     }
     data = t;
-    data.problematic = data.devices.filter((device) =>
-      fillArr(device.actions, 10).some((x) => x.endsWith('-'))
+    data.problematic = data.devices.filter((device) => {
+      const arr = fillArr(device.actions, 10)
+      let res = false;
+      res ||= arr.some((x) => x.endsWith('-'))
+      arr.pop()
+      
+      res ||= arr.some((x) => x.endsWith('?'))
+      return res
+    }
     );
     loading = false;
   };
@@ -101,64 +110,86 @@
   <title>{loading ? '(updating)' : ''} Split engine dashboard</title>
 </svelte:head>
 
-<div class="">
-  <div class="h-400px w-full p-2 flex flex-row">
-    <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
-    <div class="w-150px flex flex-col gap-2 h-full">
-      <div class="h-min">
-        <Select
-          labelText="Refresh delay"
-          bind:selected={refresh_delay}
-          on:change={(e) => console.log('value', refresh_delay)}
-        >
-          <SelectItem text={'1s'} value={1 * 1000} />
-          <SelectItem text={'10s'} value={10 * 1000} />
-          <SelectItem text={'30s'} value={30 * 1000} />
-          <SelectItem text={'1m'} value={1 * 60 * 1000} />
-          <SelectItem text={'5m'} value={5 * 60 * 1000} />
-          <SelectItem text={'10m'} value={10 * 60 * 1000} />
-        </Select>
-      </div>
+<Content>
+  <Grid class="w-full">
+    <Row>
+      <Column>
+        <div class="flex items-center gap-5 h-full">
+          <div class="">
+            <Select
+              labelText="Refresh delay"
+              bind:selected={refresh_delay}
+              on:change={(e) => console.log('value', refresh_delay)}
+            >
+              <SelectItem text={'1s'} value={1 * 1000} />
+              <SelectItem text={'10s'} value={10 * 1000} />
+              <SelectItem text={'30s'} value={30 * 1000} />
+              <SelectItem text={'1m'} value={1 * 60 * 1000} />
+              <SelectItem text={'5m'} value={5 * 60 * 1000} />
+              <SelectItem text={'10m'} value={10 * 60 * 1000} />
+            </Select>
+          </div>
 
-      {#if loading}
-        <div class="">
-          <ProgressBar helperText="Loading..." />
+          {#if loading}
+            <div class="w-200px">
+              <ProgressBar helperText="Loading..." />
+            </div>
+          {/if}
+
+          <div class="ml-auto mt-auto">
+            <Checkbox
+              labelText="Display only problematic devices"
+              bind:checked={only_problematic}
+            />
+          </div>
         </div>
-      {/if}
-
-      <div class="mt-auto">
-        <Checkbox labelText="Display only problematic devices" bind:checked={only_problematic} />
-      </div>
-    </div>
-  </div>
-
-  <div
-    class="bg-gradient-to-b from-[#80c8ff] to-[#ffc880] h-[calc(100%-400px)] w-screen absolute overflow-x-clip overflow-y-scroll"
-    on:wheel|preventDefault
-  >
-    <div
-      on:wheel={(e) => {
-        if (e.shiftKey) return;
-        panzoom?.zoomWithWheel(e);
-        updateScale();
-      }}
-      bind:this={zoomer}
-    >
-      <div class="text-center text-white">
-        {#if only_problematic}
-          <div class="grid gap-10 grid-cols-10 w-max">
-            {#each data.problematic || [] as device}
-              <DeviceComponent onClick={deviceClick} {scale} bind:device />
-            {/each}
-          </div>
-        {:else}
-          <div class="grid gap-10 grid-cols-10 w-max">
-            {#each data.devices as device}
-              <DeviceComponent onClick={deviceClick} {scale} bind:device />
-            {/each}
-          </div>
-        {/if}
-      </div>
-    </div>
-  </div>
-</div>
+      </Column>
+    </Row>
+    <Row>
+      <Column>
+        <Tabs>
+          <Tab label="Lambda stats" />
+          <Tab label="Devices" />
+          <svelte:fragment slot="content">
+            <TabContent>
+              <div class="h-[calc(100vh-200px)] w-full p-2 flex flex-row">
+                <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
+              </div>
+            </TabContent>
+            <TabContent>
+              <div
+                class="bg-white h-[calc(100%-160px)] w-full -mx-80px absolute overflow-x-clip overflow-y-clip"
+                on:wheel|preventDefault
+              >
+                <div
+                  on:wheel={(e) => {
+                    if (e.shiftKey) return;
+                    panzoom?.zoomWithWheel(e);
+                    updateScale();
+                  }}
+                  bind:this={zoomer}
+                >
+                  <div class="text-center text-white">
+                    {#if only_problematic}
+                      <div class="grid gap-10 grid-cols-10 w-max">
+                        {#each data.problematic || [] as device}
+                          <DeviceComponent onClick={deviceClick} {scale} bind:device />
+                        {/each}
+                      </div>
+                    {:else}
+                      <div class="grid gap-10 grid-cols-10 w-max">
+                        {#each data.devices as device}
+                          <DeviceComponent onClick={deviceClick} {scale} bind:device />
+                        {/each}
+                      </div>
+                    {/if}
+                  </div>
+                </div>
+              </div>
+            </TabContent>
+          </svelte:fragment>
+        </Tabs>
+      </Column>
+    </Row>
+  </Grid>
+</Content>

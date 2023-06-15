@@ -32,15 +32,18 @@ const schema = new Schema({
 const DeviceSplitstat = model('device_splitstat', schema);
 
 export const handler: Handler = async (event) => {
-  const raw = await DeviceSplitstat.scan().exec();
+  const raw = await DeviceSplitstat.scan()
+  // .limit(100)
+  .exec();
 
   const devices: DeviceData['devices'] = raw.map((item) => {
     return {
-      currentSessionId: item.sessionID,
+      current_session_id: item.sessionID,
       actions: item.history_string,
-      deviceId: item.deviceID,
-      engineId: item.engineID,
-      shardId: item.shardID,
+      device_id: item.deviceID,
+      engine_id: item.engineID,
+      shard_id: item.shardID,
+      lambda_ts: item.lambda_ts,
       date: new Date(item.kinesis_record_ts * 1000).toISOString()
     };
   });

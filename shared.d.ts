@@ -1,10 +1,11 @@
 export interface Device {
   date: string;
-  deviceId: string;
-  engineId: string;
-  currentSessionId: string;
-  shardId: string;
+  device_id: string;
+  engine_id: string;
+  current_session_id: string;
+  shard_id: string;
   actions: string;
+  lambda_ts: number; 
 }
 
 export interface LambdaStats {

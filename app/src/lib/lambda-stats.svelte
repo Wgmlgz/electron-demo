@@ -60,9 +60,9 @@
         type: 'bar',
         label: 'Queuing time',
         data: Object.values(lambda_stats).map(({ queuing_time }) => -queuing_time),
-        backgroundColor: ['rgba(255, 134,159,0.4)'],
+        backgroundColor: ['#da1e2840'],
         borderWidth: 2,
-        borderColor: ['rgba(255, 134, 159, 1)'],
+        borderColor: ['#da1e28'],
 
         datalabels: {
           offset: 0,
@@ -78,9 +78,9 @@
         type: 'bar',
         label: 'Lambda inactivity',
         data: Object.values(lambda_stats).map(({ lambda_inactivity }) => lambda_inactivity),
-        backgroundColor: ['rgba(98,  182, 239,0.4)'],
+        backgroundColor: ['#4589ff40'],
         borderWidth: 2,
-        borderColor: ['rgba(98,  182, 239, 1)'],
+        borderColor: ['#4589ff'],
         datalabels: {
           offset: 0,
           anchor: 'end',
@@ -118,7 +118,7 @@
         label: 'Max lambda inactivity',
         data: Object.values(lambda_stats).map(({ max_lambda_inactivity }) => max_lambda_inactivity),
         backgroundColor: '#0000',
-        borderColor: ['rgba(98,  182, 239, 1)'],
+        borderColor: ['#4589ff'],
         borderWidth: {
           top: 0,
           right: 6,
