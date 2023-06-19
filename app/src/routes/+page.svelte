@@ -152,6 +152,11 @@
           <Tab label="Devices" />
           <svelte:fragment slot="content">
             <TabContent>
+              <div class="h-[calc(100vh-200px)] w-full p-2 flex flex-row">
+                <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
+              </div>
+            </TabContent>
+            <TabContent>
               <div
                 class="bg-white h-[calc(100%-160px)] w-full -mx-80px absolute overflow-x-clip overflow-y-clip"
                 on:wheel|preventDefault
@@ -180,11 +185,6 @@
                     {/if}
                   </div>
                 </div>
-              </div>
-            </TabContent>
-            <TabContent>
-              <div class="h-[calc(100vh-200px)] w-full p-2 flex flex-row">
-                <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
               </div>
             </TabContent>
           </svelte:fragment>
