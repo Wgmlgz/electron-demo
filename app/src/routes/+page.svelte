@@ -10,6 +10,7 @@
   import { fillArr } from '$lib/utils';
   import { Tabs, Tab, TabContent } from 'carbon-components-svelte';
   import { Grid, Row, Column } from 'carbon-components-svelte';
+  import Devices from '$lib/devices.svelte';
 
   let data: DeviceData = {
     devices: [],
@@ -21,6 +22,7 @@
   const refresh = async () => {
     loading = true;
     const t: DeviceData = (await axios.get(PUBLIC_BASE_URL)).data;
+    if (!t) return;
     console.log('update');
 
     for (const shard in t.lambda_stats) {
@@ -36,15 +38,14 @@
     }
     data = t;
     data.problematic = data.devices.filter((device) => {
-      const arr = fillArr(device.actions, 10)
+      const arr = fillArr(device.actions, 10);
       let res = false;
-      res ||= arr.some((x) => x.endsWith('-'))
-      arr.pop()
-      
-      res ||= arr.some((x) => x.endsWith('?'))
-      return res
-    }
-    );
+      res ||= arr.some((x) => x.endsWith('-'));
+      arr.pop();
+
+      res ||= arr.some((x) => x.endsWith('?'));
+      return res;
+    });
     loading = false;
   };
 
@@ -157,9 +158,12 @@
               </div>
             </TabContent>
             <TabContent>
-              <div
-                class="bg-white h-[calc(100%-160px)] w-full -mx-80px absolute overflow-x-clip overflow-y-clip"
-                on:wheel|preventDefault
+              <div class="w-full h-[calc(100vh-200px)]">
+
+                <Devices devices={data.devices} />
+              </div>
+              <!-- <div
+                class="bg-white  w-full -mx-80px absolute"
               >
                 <div
                   on:wheel={(e) => {
@@ -185,7 +189,7 @@
                     {/if}
                   </div>
                 </div>
-              </div>
+              </div> -->
             </TabContent>
           </svelte:fragment>
         </Tabs>

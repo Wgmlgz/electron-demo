@@ -33,7 +33,7 @@ const DeviceSplitstat = model('device_splitstat', schema);
 
 export const handler: Handler = async (event) => {
   const raw = await DeviceSplitstat.scan()
-  // .limit(100)
+  // .limit(500)
   .exec();
 
   const devices: DeviceData['devices'] = raw.map((item) => {
