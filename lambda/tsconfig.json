@@ -7,7 +7,7 @@
     "target": "es5",
     "outDir": ".build",
     "moduleResolution": "node",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "rootDir": "./",
   }
 }

@@ -21,6 +21,7 @@
   const refresh = async () => {
     loading = true;
     const t: DeviceData = (await axios.get(PUBLIC_BASE_URL)).data;
+    if (!t) return;
     console.log('update');
 
     for (const shard in t.lambda_stats) {
@@ -36,15 +37,14 @@
     }
     data = t;
     data.problematic = data.devices.filter((device) => {
-      const arr = fillArr(device.actions, 10)
+      const arr = fillArr(device.actions, 10);
       let res = false;
-      res ||= arr.some((x) => x.endsWith('-'))
-      arr.pop()
-      
-      res ||= arr.some((x) => x.endsWith('?'))
-      return res
-    }
-    );
+      res ||= arr.some((x) => x.endsWith('-'));
+      arr.pop();
+
+      res ||= arr.some((x) => x.endsWith('?'));
+      return res;
+    });
     loading = false;
   };
 
@@ -152,11 +152,6 @@
           <Tab label="Devices" />
           <svelte:fragment slot="content">
             <TabContent>
-              <div class="h-[calc(100vh-200px)] w-full p-2 flex flex-row">
-                <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
-              </div>
-            </TabContent>
-            <TabContent>
               <div
                 class="bg-white h-[calc(100%-160px)] w-full -mx-80px absolute overflow-x-clip overflow-y-clip"
                 on:wheel|preventDefault
@@ -171,13 +166,13 @@
                 >
                   <div class="text-center text-white">
                     {#if only_problematic}
-                      <div class="grid gap-10 grid-cols-10 w-max">
+                      <div class="grid gap-10 grid-cols-20 w-max">
                         {#each data.problematic || [] as device}
                           <DeviceComponent onClick={deviceClick} {scale} bind:device />
                         {/each}
                       </div>
                     {:else}
-                      <div class="grid gap-10 grid-cols-10 w-max">
+                      <div class="grid gap-10 grid-cols-20 w-max">
                         {#each data.devices as device}
                           <DeviceComponent onClick={deviceClick} {scale} bind:device />
                         {/each}
@@ -185,6 +180,11 @@
                     {/if}
                   </div>
                 </div>
+              </div>
+            </TabContent>
+            <TabContent>
+              <div class="h-[calc(100vh-200px)] w-full p-2 flex flex-row">
+                <LambdaStatsComponent bind:lambda_stats={data.lambda_stats} />
               </div>
             </TabContent>
           </svelte:fragment>
