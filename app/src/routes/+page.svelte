@@ -10,6 +10,9 @@
   import { fillArr } from '$lib/utils';
   import { Tabs, Tab, TabContent } from 'carbon-components-svelte';
   import { Grid, Row, Column } from 'carbon-components-svelte';
+  import { TextInput } from 'carbon-components-svelte';
+  import { isMatch } from 'matcher';
+  import { Tooltip } from 'carbon-components-svelte';
 
   let data: DeviceData = {
     devices: [],
@@ -18,6 +21,8 @@
   };
 
   let loading = false;
+  let enable_pattern = false;
+  let pattern = '';
   const refresh = async () => {
     loading = true;
     const t: DeviceData = (await axios.get(PUBLIC_BASE_URL)).data;
@@ -137,6 +142,21 @@
           {/if}
 
           <div class="ml-auto mt-auto">
+            <Tooltip triggerText="Filter devices">
+              <p>
+                Use * to match zero or more characters.
+                <br />
+                A leading ! negates the pattern.
+              </p>
+              <a href="https://github.com/sindresorhus/matcher" target="_blank"> read more</a>
+            </Tooltip>
+            <TextInput
+              hideLabel
+              bind:value={pattern}
+              labelText="Filter devices"
+              placeholder="pattern like !stress*"
+            />
+            <Checkbox labelText="Enable pattern filter" bind:checked={enable_pattern} />
             <Checkbox
               labelText="Display only problematic devices"
               bind:checked={only_problematic}
@@ -170,19 +190,25 @@
                   bind:this={zoomer}
                 >
                   <div class="text-center text-white">
-                    {#if only_problematic}
+                    <!-- {#if only_problematic} -->
+                    <div class="grid gap-10 grid-cols-20 w-max">
+                      {#each (only_problematic ? data.problematic || [] : data.devices).filter( (device) => {
+                          if (enable_pattern) {
+                            return isMatch(device.device_id, pattern);
+                          } else {
+                            return true;
+                          }
+                        } ) as device}
+                        <DeviceComponent onClick={deviceClick} {scale} bind:device />
+                      {/each}
+                    </div>
+                    <!-- {:else}
                       <div class="grid gap-10 grid-cols-20 w-max">
-                        {#each data.problematic || [] as device}
+                        {#each  as device}
                           <DeviceComponent onClick={deviceClick} {scale} bind:device />
                         {/each}
                       </div>
-                    {:else}
-                      <div class="grid gap-10 grid-cols-20 w-max">
-                        {#each data.devices as device}
-                          <DeviceComponent onClick={deviceClick} {scale} bind:device />
-                        {/each}
-                      </div>
-                    {/if}
+                    {/if} -->
                   </div>
                 </div>
               </div>
