@@ -35,18 +35,22 @@
   const format = (value: number | string) => {
     const r = Math.abs(Number(value));
     const s = Math.floor(r % 60);
-    const m = Math.floor(r / 60);
+    const m = Math.floor((r / 60) % 60);
+    const h = Math.floor((r / (60 * 60)) % 24);
+    const d = Math.floor(r / (60 * 60 * 24));
 
-    let str = '';
-    if (m) str += `${m}m `;
-    if (1) str += `${s}s `;
+    const str = [
+      d && `${d}d `,
+      (d || h) && `${h}h `,
+      (d || h || m) && `${m}m `,
+      (d || h || m || s) && `${s}s `
+    ]
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(' ');
+
     return str;
   };
-  // const tooltip_cb: any = {
-  //   label: (tooltipItem: any, data: any) => {
-  //     return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-  //   }
-  // };
 
   $: data = {
     labels: Object.keys(lambda_stats),
@@ -65,9 +69,9 @@
         borderColor: ['#da1e28'],
 
         datalabels: {
-          offset: 0,
+          offset: 6,
           anchor: 'start',
-          align: 'start',
+          align: 'end',
           formatter(value, context) {
             return format(value);
           },
@@ -82,9 +86,9 @@
         borderWidth: 2,
         borderColor: ['#4589ff'],
         datalabels: {
-          offset: 0,
+          offset: 6,
           anchor: 'end',
-          align: 'end',
+          align: 'start',
           formatter(value, context) {
             return format(value);
           },
