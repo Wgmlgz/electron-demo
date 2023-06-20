@@ -16,8 +16,7 @@
   $: {
     const new_simplified = scale <= MIN_SCALE;
     if (new_simplified !== simplified) {
-
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         simplified = new_simplified;
       });
     }
@@ -40,89 +39,109 @@
     onClick(e, elem);
   }}
 >
-  {#if visible || simplified}
-    <div class="absolute top-1px right-2px">
-      <ButtonSet>
-        <OverflowMenu flipped light size="xl">
-          <OverflowMenuItem>
-            <OutboundLink
-              class="whitespace-nowrap"
-              href={`https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252Flog-test/log-events$3FfilterPattern$3D${encodeURI(
-                `ENGINE_${device.device_id}`
-              )}$26start$3D-3600000`}
-            >
-              Cloudwatch logs
-            </OutboundLink>
-          </OverflowMenuItem>
-
-          <div class="flex items-center w-full">
-            <div class="grow grid content-center">
-              <div>Copy device id</div>
-            </div>
-            <CopyButton text={device.device_id} />
-          </div>
-
-          <div class="flex items-center w-full">
-            <div class="grow grid content-center">
-              <div>Copy session id</div>
-            </div>
-            <CopyButton text={device.current_session_id} />
-          </div>
-
-          <div class="flex items-center w-full">
-            <div class="grow grid content-center">
-              <div>Copy engine name</div>
-            </div>
-            <CopyButton text={device.engine_id} />
-          </div>
-        </OverflowMenu>
-      </ButtonSet>
-    </div>
-    <h3 class="w-full text-center box h-50px whitespace-nowrap">
-      {#if !simplified}
-        {moment(device.lambda_ts * 1000).format('LLL')}
-      {/if}
-    </h3>
-    <div class="box box-secondary h-100px">
-      {#if !simplified}
-        <div class="flex w-500px h-50px">
-          <h3 class="inline-block w-250px">
-            {device.device_id}
-          </h3>
-          <h3 class="inline-block w-250px">
-            {device.current_session_id}
-          </h3>
-        </div>
-        <div class="h-50px">
-          {#if device.engine_id}
-            <p class="">
-              {device.engine_id}
-            </p>
-          {:else}
-            <h3 class="font-bold">ENGINE PATH NOT FOUND</h3>
-          {/if}
-        </div>
-      {/if}
-    </div>
-
-    <div class="grid grid-cols-10 h-50px">
-      {#each fillArr(device.actions, 10) as action}
-        <h3
-          class="box text-center justify-items-center"
-          class:box-err={action.endsWith('-')}
-          class:box-ok={action.endsWith('+')}
-          class:box-unknown={action.endsWith('?')}
-        >
-          {#if !simplified}
-            {action[0]}
-          {/if}
-        </h3>
-      {/each}
-    </div>
+  {#if visible}
     {#if !simplified}
-      <h2 class="text-center box h-50px">
-        shrd: {device.shard_id}
-      </h2>
+      <div class="absolute top-1px right-2px">
+        <ButtonSet>
+          <OverflowMenu flipped light size="xl">
+            <OverflowMenuItem>
+              <OutboundLink
+                class="whitespace-nowrap"
+                href={`https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Faws$252Flambda$252Flog-test/log-events$3FfilterPattern$3D${encodeURI(
+                  `ENGINE_${device.device_id}`
+                )}$26start$3D-3600000`}
+              >
+                Cloudwatch logs
+              </OutboundLink>
+            </OverflowMenuItem>
+
+            <div class="flex items-center w-full">
+              <div class="grow grid content-center">
+                <div>Copy device id</div>
+              </div>
+              <CopyButton text={device.device_id} />
+            </div>
+
+            <div class="flex items-center w-full">
+              <div class="grow grid content-center">
+                <div>Copy session id</div>
+              </div>
+              <CopyButton text={device.current_session_id} />
+            </div>
+
+            <div class="flex items-center w-full">
+              <div class="grow grid content-center">
+                <div>Copy engine name</div>
+              </div>
+              <CopyButton text={device.engine_id} />
+            </div>
+          </OverflowMenu>
+        </ButtonSet>
+      </div>
+
+      <h3 class="w-full text-center box h-50px whitespace-nowrap">
+        {#if !simplified}
+          {moment(device.lambda_ts * 1000).format('LLL')}
+        {/if}
+      </h3>
+      <div class="box-secondary h-100px">
+        {#if !simplified}
+          <div class="flex w-500px h-50px">
+            <h3 class="inline-block w-250px">
+              {device.device_id}
+            </h3>
+            <h3 class="inline-block w-250px">
+              {device.current_session_id}
+            </h3>
+          </div>
+        {/if}
+        <div class="h-50px" class:box-warning={!device.engine_id}>
+          {#if !simplified}
+            {#if device.engine_id}
+              <p class="">
+                {device.engine_id}
+              </p>
+            {:else}
+              <h3 class="font-bold">ENGINE PATH NOT FOUND</h3>
+            {/if}
+          {/if}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-10 h-50px">
+        {#each fillArr(device.actions, 10) as action}
+          <h3
+            class="box text-center justify-items-center"
+            class:box-err={action.endsWith('-')}
+            class:box-ok={action.endsWith('+')}
+            class:box-unknown={action.endsWith('?')}
+          >
+            {#if !simplified}
+              {action[0]}
+            {/if}
+          </h3>
+        {/each}
+      </div>
+      {#if !simplified}
+        <h2 class="text-center box h-50px">
+          shrd: {device.shard_id}
+        </h2>
+      {/if}
+    {:else}
+      <div class="top-150px w-500px grid grid-cols-10 h-250px">
+        {#each fillArr(device.actions, 10) as action}
+          <h3
+            class="box text-center justify-items-center"
+            class:box-err={action.endsWith('-')}
+            class:box-ok={action.endsWith('+')}
+            class:box-unknown={action.endsWith('?')}
+          >
+            {#if !simplified}
+              {action[0]}
+            {/if}
+          </h3>
+        {/each}
+      </div>
     {/if}
   {/if}
 </div>

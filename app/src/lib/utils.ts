@@ -1,4 +1,4 @@
-export const MIN_SCALE = 0.8;
+export const MIN_SCALE = 0.4;
 
 export const fillArr = (actions: string, n = 5, sus = '  ') => {
   const arr = actions.match(/.{1,2}/g);
