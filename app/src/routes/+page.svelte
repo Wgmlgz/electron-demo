@@ -26,30 +26,34 @@
   const refresh = async () => {
     loading = true;
     const t: DeviceData = (await axios.get(PUBLIC_BASE_URL)).data;
-    if (!t) return;
     console.log('update');
-
-    for (const shard in t.lambda_stats) {
-      const value = t.lambda_stats[shard];
-      value.max_lambda_inactivity = Math.max(
-        value.lambda_inactivity,
-        data.lambda_stats[shard]?.max_lambda_inactivity || 0
-      );
-      value.max_queuing_time = Math.max(
-        value.queuing_time,
-        data.lambda_stats[shard]?.max_queuing_time || 0
-      );
+    if (!t) return;
+    if (t.lambda_stats) {
+      for (const shard in t.lambda_stats) {
+        const value = t.lambda_stats[shard];
+        value.max_lambda_inactivity = Math.max(
+          value.lambda_inactivity,
+          data.lambda_stats[shard]?.max_lambda_inactivity || 0
+        );
+        value.max_queuing_time = Math.max(
+          value.queuing_time,
+          data.lambda_stats[shard]?.max_queuing_time || 0
+        );
+      }
     }
     data = t;
-    data.problematic = data.devices.filter((device) => {
-      const arr = fillArr(device.actions, 10);
-      let res = false;
-      res ||= arr.some((x) => x.endsWith('-'));
-      arr.pop();
+    if (t.devices) {
+      data.problematic = data.devices.filter((device) => {
+        const arr = fillArr(device.actions, 10);
+        let res = false;
+        res ||= arr.some((x) => x.endsWith('-'));
+        arr.pop();
 
-      res ||= arr.some((x) => x.endsWith('?'));
-      return res;
-    });
+        res ||= arr.some((x) => x.endsWith('?'));
+        return res;
+      });
+    }
+
     loading = false;
   };
 
