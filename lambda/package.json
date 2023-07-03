@@ -18,7 +18,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "serverless offline start --reloadHandler --httpPort 666"
+    "dev": "serverless offline start --reloadHandler --httpPort 3006"
   },
   "keywords": [],
   "author": "",
